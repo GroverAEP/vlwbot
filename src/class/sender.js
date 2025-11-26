@@ -32,9 +32,13 @@ export class Sender {
 
 
 
-    async text(jid, text, quoted = null) {
+    async text(jid, text = "", quoted = null) {
+
+        const safeText = (typeof text === "string") ? text : String(text ?? "");
+    
         return await this.sock.sendMessage(jid, { 
-            text: `${text}\n\n_${this.footer}_` 
+            text: `${safeText}`
+            // text: `${safeText}\n\n_${this.footer}_` 
         }, { quoted });
     }
 
@@ -58,13 +62,28 @@ export class Sender {
         }, { quoted });
     }
 
-    async image(msg, bufferOrUrl, caption = '', options = {}) {
+    async image(msg, bufferOrUrl, options = {}) {
         const jid = msg.key.remoteJid;
+        const {
+                ptt = false,     // valor por defecto
+                quoted = null,   // valor por defecto
+                waveform = null,
+                seconds = 0,
+                caption = ""
+            } = options;
 
         return await this.sock.sendMessage(jid, {
             image: typeof bufferOrUrl === 'string' ? { url: bufferOrUrl } : bufferOrUrl,
             caption: caption ? `${caption}\n\n_${this.footer}_` : this.footer
         }, { quoted });
+    }
+
+    async delete(msg, msgDelete, timer ) {
+        const jid = msg.key.remoteJid;
+
+         setTimeout(async () => {
+                    await this.sock.sendMessage(jid, { delete: msgDelete.key });
+            }, timer);
     }
 
     async video(msg, buffer, options = {}) {
@@ -85,7 +104,16 @@ export class Sender {
         });
     }
 
-    async sticker(jid, buffer, quoted = null) {
+    async sticker(jid, buffer, options ={}) {
+        const {
+                        ptt = false,     // valor por defecto
+                        quoted = null,   // valor por defecto
+                        waveform = null,
+                        seconds = 0,
+                        gif = false,
+                        caption = "",
+                    } = options;
+
         return await this.sock.sendMessage(jid, { sticker: buffer }, { quoted });
     }
 

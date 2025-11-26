@@ -27,12 +27,11 @@ export const handlerStickerCommand = new Handler(
     )
 
 
-async function StickerCommand({msg,text,client,sock})
-
-
-{
+async function StickerCommand({msg,text,client,sock}){
   const PREFIX = client.config.defaults.prefix;
   const DisparadoresMenu = [`${PREFIX}s`, `${PREFIX}sticker`];
+  
+  console.log("handlerStickerComando")
 
     const normalize = (str) => str.trim().toLowerCase() 
 
@@ -47,15 +46,19 @@ async function StickerCommand({msg,text,client,sock})
     }
   
     let mediaMsg = await extractMedia(msg);
-
+    
+    console.log(msg);
     // ⚠️ Validación inicial
-    if (!mediaMsg) {
+    console.log(mediaMsg);
+    console.log(!mediaMsg);
+    console.log(mediaMsg === null);
+    if (!mediaMsg|| mediaMsg === null) {
       
-      await client.send.reply(msg, {
-        text: '❌ Envía o responde a una imagen o video (mp4, mov, mkv, webm) con el comando *!sticker*'
-      })
+      await client.send.reply(msg,'❌ Envía o responde a una imagen o video (mp4, mov, mkv, webm) con el comando *!sticker*')
       return;
     }
+
+
     console.log(msg)
     console.log(mediaMsg)
 
@@ -146,7 +149,7 @@ async function StickerCommand({msg,text,client,sock})
         // 📤 Enviar sticker al usuario
         await client.send.sticker(msg.key.remoteJid, fs.readFileSync(tempOutput) ,msg)
 
-        console.log('✅ Sticker enviado correctamente')
+        console.log(`✅ Sticker enviado correctamente ${fs.readFileSync(tempOutput)}`)
 
         // 🧹 Limpiar archivos temporales (1 segundo después)
         setTimeout(() => {

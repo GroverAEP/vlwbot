@@ -8,11 +8,40 @@ import fs from "fs";
 import path from "path";
 import { sendVideo } from "../../events/sendMultimedia.js";
 
+const name = "test";
+const role = "all";
+
+// para crear el menu automatico de cada comando
+const act_hola = ["hola"]
+const act_e = ["e"]
+const act_say = ["say"]
+const act_mp3 = ["mp3"]
+const act_yt = ["yt"]
+const act_bl = ["bl"]
+
+const act_menu = []
 
 export const handlerTestCommand = {
     name: "test",
     role: "all",
-    run: async ({ msg, text, client,sock }) => {
+    run: TestCommand,
+    // menu: 
+}
+
+async function MenuTest({client}) {
+    try {
+
+       const MenuTest = 
+       ` ------------${name}-----------------
+        !
+       `
+    } catch (error) {
+        
+    }
+}
+
+
+async function TestCommand  ({ msg, text, client,sock }) {
         try {
             const sender = msg.key.participant || msg.key.remoteJid;
             console.log(sender)
@@ -26,10 +55,10 @@ export const handlerTestCommand = {
 
             // Comando !explote o !e
             if (text === `${prefix}e` || text === `${prefix}explote`) {
-                const msgExplote = await client.send.reply(msg, 'Este mensaje va a explotar en 10 segundos!');
-                setTimeout(async () => {
-                    await client.sock.sendMessage(sender, { delete: msgExplote.key });
-                }, 10000);
+                const msgExplote = await client.send.reply(msg, 'Este mensaje va a explotar en 3 segundos!');
+                
+                await client.send.delete(msg,msgExplote,3000);
+                return;
             }
 
             // Comando !say
@@ -40,15 +69,11 @@ export const handlerTestCommand = {
                 } else {
                     await client.send.reply(msg, `El comando necesita que definas el texto: ${prefix}say {texto}`);
                 }
+                return;
             }
-
-        //         // Comando !v
-        //         if (text === "!v") {
-        //    await sock.sendMessage(sender,{
-        //                 video: {url:`${VIDEO}PokeApi.mp4`},
-        //                 caption: "Un video para aprender PokeApi node.js"
-        //             }) }
-
+                // Comando !v
+            if (text === "!v") {
+            await client.send.video(chatId,{url:`${VIDEO}PokeApi.mp4`},"Un video para aprender PokeApi node.js" )}
                     
                 // // Comando !v
                 // if (text === "!v") {
@@ -113,30 +138,119 @@ export const handlerTestCommand = {
                 //         await client.send.reply(msg, "❌ Error enviando video.");
                 //     }
                 // }
-            // Comando !yt
-            if (text.startsWith(`${prefix}yt`)) {
-                const parts = text.split(" ");
-                if (parts.length === 1) {
-                    await client.send.reply(msg, "Comando no disponible");
-                } else {
-                    const url = parts[1];
-                    await client.send.reply(msg, "📥 Descargando video, espera...");
-                    try {
-                        const { outputPath, json } = await downloadYoutubeVideo(url);
-                        // await client.sock.sendMessage(sender, {
-                        //     video: { url: outputPath },
-                        //     mimetype: "video/mp4",
-                        //     caption: `| Video de YouTube | \n- Nombre: ${json.title} 🎬`
-                        // });
-                      await multimedia.sendVideo(sender, filePath, "Un video para aprender PokeApi");
-                        // Limpieza si quieres
-                        // setTimeout(() => deleteFile(outputPath), 5000);
-                    } catch (err) {
-                        await client.send.reply(msg, "❌ Error al descargar el video.");
-                        console.error(err);
-                    }
-                }
-            }
+
+
+                 if (text.startsWith(`${prefix}bl`)) {
+                           const query = text.slice(`${prefix}bl `.length).trim();
+                           //validar en caso query no exista
+                           console.log("comando: BL");
+                           console.log(!query);
+                           if (!query) {
+                            await client.send.reply(msg, "❌ Debes escribir un enlace o nombre de video.\n Sitio web: BiliBili.com");
+                             return;
+                           }
+                             
+                           //Si quey existe ejecuta todo esto
+                           try {
+                              await client.send.reply(msg, "📥 Descargando el video de bl, espera...");
+                               const filePath = await downloadBiliVideo(query);
+                               await client.send.video(msg, { url: filePath },{caption: "Este es el video BL encontrado",quoted: msg});
+                               setTimeout(() => deleteFile(filePath), 5000);
+                            
+                              return;
+                
+                             } catch (err) {
+                               await client.send.reply(msg, `❌ Error al descargar el video. ${err}`);
+                               console.error(err);
+                           }
+                       }
+                        if (text.startsWith(`${prefix}mp3`)) {
+                            const query = text.slice(`${prefix}mp3 `.length).trim();
+                
+                            console.log("Comando : Mp3")
+                            console.log(!query);
+                
+                            
+                            //Validacion de errors| caso query no exista
+                            if (!query) {
+                                await client.send.reply(msg, "❌ Debes escribir un enlace o nombre de canción.\n Utiliza: !mp3 {url - nombre}");
+                                return; // ← Esto detiene TODO lo que viene después
+                            }   
+                            
+                            
+                            // Si query existe ejecuta todo esto.
+                            await client.send.reply(msg, "📥 Descargando Audio, espera...");
+                            try {
+                                const filePath = await downloadYoutubeMp3(query);
+                                // await client.send.audio(sender,filePath,msg);
+                                
+                
+                                  await client.send.audio(msg, filePath,{quoted: msg});
+                
+                                setTimeout(() => deleteFile(filePath), 5000);
+                            } catch (err) {
+                                await client.send.reply(msg, `❌ Error al descargar el audio. ${err}\n - 
+                                  Utiliza: !mp3 {url - nombre}`);
+                                //elimina la carpeta de auth y vuelve a ejecutra el npm run
+                                console.error(err);
+                            }
+                            }
+                
+                            
+                            // Comando !yt
+                            if (text.startsWith(`${prefix}yt`)) {
+                                const query = text.slice(`${prefix}yt `.length).trim();
+                                
+                                if (!query) {
+                                    await client.send.reply(msg, "❌ Debes escribir un enlace o nombre de canción. \n site:youtube - Utiliza: !yt {url} ");
+                                  return; // ← Esto detiene TODO lo que viene después
+                                }   
+                
+                                // if (parts.length === 1) {
+                                //     await client.send.reply(msg, "Comando no disponible");
+                                // } else {
+                                //     const url = parts[1];
+                                try {
+                                    await client.send.reply(msg, "📥 Descargando video de youtube, espera...");
+                                    const { file, title } = await downloadYoutubeVideo(query);
+                                    await client.send.video(msg,{ url: file } , {caption: `| Video de YouTube | \n- Nombre: ${title} 🎬`} );
+                                    // await multimedia.sendVideo(sender, filePath, "Un video para aprender PokeApi");
+                                    // Limpieza si quieres
+                                    setTimeout(() => deleteFile(file), 5000);
+                                    return;
+                                } catch (err) {
+                                    await client.send.reply(msg, `❌ Error al descargar el video de Youtube.${err}`);
+                                    console.error(err);
+                                    return;
+                                }
+                              }
+
+
+                
+            // // Comando !yt
+            // if (text.startsWith(`${prefix}yt`)) {
+            //     const parts = text.split(" ");
+            //     if (parts.length === 1) {
+            //         await client.send.reply(msg, "Comando no disponible");
+            //     } else {
+            //         const url = parts[1];
+            //         await client.send.reply(msg, "📥 Descargando video, espera...");
+            //         try {
+            //             const { outputPath, json } = await downloadYoutubeVideo(url);
+            //             // await client.sock.sendMessage(sender, {
+            //             //     video: { url: outputPath },
+            //             //     mimetype: "video/mp4",
+            //             //     caption: `| Video de YouTube | \n- Nombre: ${json.title} 🎬`
+            //             // });
+            //           await multimedia.sendVideo(sender, filePath, "Un video para aprender PokeApi");
+            //             // Limpieza si quieres
+            //             // setTimeout(() => deleteFile(outputPath), 5000);
+            //         } catch (err) {
+            //             await client.send.reply(msg, "❌ Error al descargar el video.");
+            //             console.error(err);
+            //         }
+            //     }
+            // }
 
             // // Comando !mp3
             // if (text.startsWith(`${prefix}mp3 `)) {
@@ -189,5 +303,4 @@ export const handlerTestCommand = {
         } catch (error) {
             console.error("Error en handlerTestCommand:", error);
         }
-    }
-};
+    };

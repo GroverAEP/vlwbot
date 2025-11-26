@@ -5,15 +5,12 @@ import https from "https";
 /// Method: GetPokemon
 /// Uso: Obtiene un pokemon por nombre
 ////////////////////////////////////////
-export async function getPokemon(name) {
+export async function getPokemon(nameOrId) {
   try {
-    // Obtengo la data de un pokemon 
-    const rest = await axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`,{
-    });
-    
-    console.log(rest);
-    return rest.data;
-
+    const res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${nameOrId}`);
+    return res.data;
   } catch (e) {
-    console.error("❌ Error en getPokemon:", e);  }
+    console.error("❌ Error en getPokemon:", e?.response?.status);
+    return null; // importante para manejar errores
+  }
 }

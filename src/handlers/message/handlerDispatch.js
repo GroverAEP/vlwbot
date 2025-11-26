@@ -19,7 +19,7 @@ const handlers = [
     // handleGroupCommand
 ];
 
-export const dispatchHandlers = async (msg,text,client,sock) => {
+export const dispatchHandlers = async (msg,text,client) => {
     const owners = await client.manager.owners.load()
     const admins = await client.manager.admins.load()
     const users = await client.manager.users.load()
@@ -42,10 +42,17 @@ export const dispatchHandlers = async (msg,text,client,sock) => {
     for (const handler of handlers) {
         try {
                   // 1. Validar permisos
-            if (handler.role === "owner" && !userIsOwner) continue;
-            if (handler.role === "admin" && !userIsAdmin && !userIsOwner) continue;
+            if (handler.role === "owner" && !userIsOwner) {
+                await client.send.reply(msg.key.remoteJid, "⛔ *Usted no puede usar este comando. Solo los dueños*");
+            continue;
+            }
 
-            await handler.run({msg,text,client,sock});
+            if (handler.role === "admin" && !userIsAdmin && !userIsOwner){
+                await client.send.reply(msg, "⛔ *Usted no puede usar este comando. Solo los administradores del grupo*")
+            continue;
+            } 
+
+            await handler.run({msg,text,client});
         } catch (err) {
             console.error("Error en handler:", handler.name, err);
         }

@@ -23,6 +23,7 @@ import { Users } from './src/core/users.js'
 import { downloadYoutubeMp3 } from './src/services/youtubeServices/getMp3Url.js'
 import { deleteFile } from './src/utils/deleteFile.js'
 import { downloadBiliVideo } from './src/services/BilibiliServices/getVideo.js'
+import { downloadYoutubeVideo } from './src/services/youtubeServices/getVideoUrl.js'
 
 // ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 const processedMessages = new Set();
@@ -204,13 +205,61 @@ function setupConnectionEvents(client,saveCreds) {
         setTimeout(startBot, 5000);      
       } else {
         console.log('🚫 Sesión inválida. Borra la carpeta "session" y vuelve a escanear el QR.')
+      
+        
       }
+
+
+
     }
-  })
+// if (connection === 'close') {
+//   const code = lastDisconnect?.error?.output?.statusCode;
+//   console.log('Conexión cerrada. Código:', code);
+
+//   if (code === 401) {
+//     console.log('Sesión cerrada por WhatsApp (401). Eliminando carpeta de autenticación y reiniciando...');
+
+//     const fs = require('fs');
+//     const path = require('path');
+//     const { execSync } = require('child_process');
+
+//     // Cambia esta ruta según cómo se llame tu carpeta de sesión
+//     const sessionFolder = path.join(__dirname, 'session');     // ← común
+//     // const sessionFolder = path.join(__dirname, 'auth_info'); // ← si usas este nombre
+//     // const sessionFolder = path.join(__dirname, 'session_data');
+
+//     try {
+//       if (fs.existsSync(sessionFolder)) {
+//         fs.rmSync(sessionFolder, { recursive: true, force: true });
+//         console.log('Carpeta de sesión eliminada:', sessionFolder);
+//       }
+
+//       // Opción 1: Reiniciar con pm2 (recomendado en producción)
+//       // execSync('pm2 restart tu-bot-name');
+
+//       // Opción 2: Reiniciar con npm (ideal si usas node directamente o screen)
+//       console.log('Reiniciando el bot en 3 segundos...');
+//       setTimeout(() => {
+//         execSync('npm run start', { stdio: 'inherit' }); // o 'npm start' según tu package.json
+//         process.exit(0); // termina el proceso actual
+//       }, 3000);
+
+//     } catch (err) {
+//       console.error('Error al eliminar carpeta o reiniciar:', err);
+//       process.exit(1);
+//     }
+
+//   } else {
+//     // Para cualquier otro código (red, timeout, etc.) → solo reconecta
+//     console.log('Intentando reconectar en 5 segundos...');
+//     setTimeout(startBot, 5000);
+//   }
+    
+  });
 
   client.sock.ev.on('creds.update', saveCreds)
 
-  //agrega el owner que se conecta x primeravez en los owers y si ya existe que pase 
+//   //agrega el owner que se conecta x primeravez en los owers y si ya existe que pase 
 }
 
 
@@ -277,9 +326,11 @@ function setupConnectionEvents(client,saveCreds) {
 //   }
 
 // ==================== MENSAJES ====================
-async function setupMessageEvents(client,sock) {
-    client.sock.ev.on('messages.upsert', async ({ messages }) => {
+async function setupMessageEvents(client) {
+    client.sock.ev.on('messages.upsert', async ({ messages , type }) => {
       
+      //evita mensajes antiguos
+       if (type !== "notify") return; // <--- Solo procesa mensajes nuevos    
 
         const msg = messages[0];
         
@@ -293,8 +344,8 @@ async function setupMessageEvents(client,sock) {
         const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
         console.log(mentioned || "sin menciones"); // ['51928250746@s.whatsapp.net']
 
-        console.log(`Mensaje enviando antes de frome${msg}`)
-        console.log(`Mensaje enviando despues de fromMe${msg}`)
+        // console.log(`Mensaje enviando antes de frome${msg}`)
+        // console.log(`Mensaje enviando despues de fromMe${msg}`)
 
         if (!msg.message || msg.key.fromMe) return;
         // Evitar duplicados
@@ -304,6 +355,8 @@ async function setupMessageEvents(client,sock) {
         // Guardar para anti-delete
         client.deletedMessages.set(msg.key.id, msg);
         // Solo grupos
+
+
         if (!chatId.endsWith('@g.us')) return;
 
 
@@ -317,20 +370,44 @@ async function setupMessageEvents(client,sock) {
                 const metadata = await client.sock.groupMetadata(chatId);
               // Crear objeto nuevo
               
+          //     async function getGroupAdmins(groupId) {
+          //       const metadata = await sock.groupMetadata(groupId);
+          //       return metadata.participants
+          //           .filter(p => p.admin === "admin" || p.admin === "superadmin")
+          //           .map(p => p.id);
+          // }
               
-                const chat = {
+                    async function getGroupAdmins(groupId) {
+                          const metadata = await sock.groupMetadata(groupId);
+
+                          const adminSet = new Set();
+                          metadata.participants.forEach(p => {
+                            if (p.admin === "admin" || p.admin === "superadmin") {
+                              adminSet.add(p.id);
+                            }
+                          });
+                          console.log(metadata)
+                          console.log(metadata.participants)
+                          console.log(adminSet)
+                          
+                          return Array.from(adminSet);;
+                      }
+
+                    const chat = {
                       id: chatId,
                       nombre: `${metadata.subject}`,       // opcional: puedes poner nombre del grupo
-                      status: 'allowed'
-                  };
+                      status: 'allowed',
+                      // admins:  await getGroupAdmins(chatId)
+                      admins: await getGroupAdmins(chatId)
+                    };
                 
-                const user ={
-                      id: userId,
-                      chatId: chatId,
-                      status: 'allow'
+                // const user ={
+                //       id: userId,
+                //       chatId: chatId,
+                //       status: 'allow'
 
                       
-                  }
+                //   }
 
                 allowedChats.push(chat)
                 await client.db.local.save("chats",allowedChats)
@@ -344,31 +421,24 @@ async function setupMessageEvents(client,sock) {
         console.log(msg)
            // -------------------------------
 
- const normalizeId = (id) => {
-    if (!id || typeof id !== 'string') return '';
-    return id.replace(/\D/g, '') || id.split('@')[0].split(':')[0] || '';
-};
+            const normalizeId = (id) => {
+                if (!id || typeof id !== 'string') return '';
+                return id.replace(/\D/g, '') || id.split('@')[0].split(':')[0] || '';
+            };
 
-        const prefix = client.config.defaults.prefix;
-        const VIDEO = client.config.routes.PATH_VIDEO;
+            const prefix = client.config.defaults.prefix;
+            const VIDEO = client.config.routes.PATH_VIDEO;
 
-        if (!text.startsWith(prefix)) return;
-
-          
-                // Comando !v
-              if (text === "!v") {
-              await client.send.video(chatId,{url:`${VIDEO}PokeApi.mp4`},"Un video para aprender PokeApi node.js"
-        )}
+            if (!text.startsWith(prefix)) return;
 
      
-
-
-
 
             if (!client.middleware.isBanned({msg,client})) {
               await client.send.reply(msg,"Este usuario no puede utilizar los comandos, has sido baneado")
               return;
             };
+
+
           const owners = await client.db.local.load("owners"); // array de owners
             const users = await client.db.local.load("users");   // array de usuarios
 
@@ -399,13 +469,13 @@ async function setupMessageEvents(client,sock) {
 
 
         // Aquí irán tus comandos y handlers
-        await handleCommands(msg, text, client,sock);
+        await handleCommands(msg, text, client);
         await handleFlows(msg, client);
     });
 }
       
 // ==================== COMANDOS BÁSICOS ====================
-async function handleCommands(msg, text, client,sock) {
+async function handleCommands(msg, text, client) {
     const prefix = client.config.defaults.prefix
 
     if (!text.startsWith(prefix)) return;
@@ -426,67 +496,19 @@ async function handleCommands(msg, text, client,sock) {
           !ping → prueba
           !start → activar bot
           !sticker → convierte imagen
+          !e -> Un texto que se elimina en 10 segundos
           `);
         }
-
+        
         const VIDEO = client.config.routes.PATH_VIDEO;
-
+        
         const chatId = msg.key.remoteJid;
-
-      // Comando !mp3
-        if (text.startsWith(`${prefix}mp3 `)) {
-            const query = text.slice(`${prefix}mp3 `.length).trim();
-            if (!query) return await client.send.reply(msg, "❌ Debes escribir un enlace o nombre de canción.");
-            await client.send.reply(msg, "📥 Descargando Audio, espera...");
-            try {
-                const filePath = await downloadYoutubeMp3(query);
-                // await client.send.audio(sender,filePath,msg);
-                
-
-                  await client.send.audio(msg, filePath,{quoted: msg});
-
-                setTimeout(() => deleteFile(filePath), 5000);
-            } catch (err) {
-                await client.send.reply(msg, `❌ Error al descargar el audio. ${err}`);
-                console.error(err);
-            }
-            }
-
-             // Comando !bl
-            if (text.startsWith(`${prefix}bl `)) {
-                const query = text.slice(`${prefix}bl `.length).trim();
-                if (!query) return await client.send.reply(msg, "❌ Debes escribir un enlace o nombre de video.");
-                await client.send.reply(msg, "📥 Descargando video, espera...");
-                try {
-                    const filePath = await downloadBiliVideo(query);
-                    await client.send.video(msg, { url: filePath },{caption: "Este es el video BL encontrado",quoted: msg});
-                    // setTimeout(() => deleteFile(filePath), 5000);
-                } catch (err) {
-                    await client.send.reply(msg, `❌ Error al descargar el video. ${err}`);
-                    console.error(err);
-                }
-            }
+        
+        // Comando !mp3
+        console.log(text)
+        // Comando !bl
+      
             
-            // Comando !yt
-            if (text.startsWith(`${prefix}yt`)) {
-                const parts = text.split(" ");
-                if (parts.length === 1) {
-                    await client.send.reply(msg, "Comando no disponible");
-                } else {
-                    const url = parts[1];
-                    await client.send.reply(msg, "📥 Descargando video, espera...");
-                    try {
-                        const { outputPath, json } = await downloadYoutubeVideo(url);
-                        await client.send.video(sender,{ url: outputPath } , {caption: `| Video de YouTube | \n- Nombre: ${json.title} 🎬`} );
-                      // await multimedia.sendVideo(sender, filePath, "Un video para aprender PokeApi");
-                        // Limpieza si quieres
-                        // setTimeout(() => deleteFile(outputPath), 5000);
-                    } catch (err) {
-                        await client.send.reply(msg, "❌ Error al descargar el video.");
-                        console.error(err);
-                    }
-                }
-            }
 
 
 

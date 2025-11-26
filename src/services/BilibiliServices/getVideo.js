@@ -14,6 +14,10 @@ export async function downloadBiliVideo(query) {
             const finalQuery = isUrl ? query : `"ytsearch1:${query} site:bilibili.com"`;
             
             const cleanUrl = isUrl ? cleanYoutubeUrl(finalQuery) : finalQuery;
+            
+            console.log(`-------------------------------------\n
+                --------------Download Youtube
+                ${cleanUrl}\n------------------------------------`)
 
             // Carpeta de descarga
             const outputDir = path.join(process.cwd(), "./src/media/video");

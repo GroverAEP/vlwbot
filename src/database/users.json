@@ -55,6 +55,20 @@
       "chatId": "120363404032641551@g.us",
       "status": "allow",
       "role": "user"
+    },
+    {
+      "id": "223703807844598@lid",
+      "name": "れいど",
+      "chatId": "120363198022112318@g.us",
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "80204319994055@lid",
+      "name": "Rolando",
+      "chatId": "120363198022112318@g.us",
+      "status": "allow",
+      "role": "user"
     }
   ]
 }
