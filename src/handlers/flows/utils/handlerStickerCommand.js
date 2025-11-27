@@ -11,7 +11,20 @@ import { Handler } from '../../../core/handler.js';
 // const { Image } = pkg;
 
 // Configurar ffmpeg path correcto
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+// Ruta fallback dentro del proyecto
+const localFfmpegPath = path.join(process.cwd(), 'ffmpeg', 'bin', process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg');
+
+// Verificar si el path del paquete npm existe
+let ffmpegPath = ffmpegInstaller.path;
+if (!fs.existsSync(ffmpegPath)) {
+    console.warn('⚠️ No se encontró FFmpeg en el paquete npm, usando ruta local');
+    ffmpegPath = localFfmpegPath;
+}
+
+// Configurar fluent-ffmpeg
+ffmpeg.setFfmpegPath(ffmpegPath);
+
+console.log('Usando FFmpeg en:', ffmpegPath);
 // import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 
 
