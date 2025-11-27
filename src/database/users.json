@@ -69,6 +69,13 @@
       "chatId": "120363198022112318@g.us",
       "status": "allow",
       "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chatId": "51960847908-1588007415@g.us",
+      "status": "allow",
+      "role": "user"
     }
   ]
 }

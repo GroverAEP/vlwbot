@@ -2,10 +2,8 @@ import makeWASocket, { useMultiFileAuthState,  downloadMediaMessage
 , fetchLatestBaileysVersion } from '@whiskeysockets/baileys'
 import qrcode from 'qrcode-terminal'
 import fs from 'fs-extra'
-import sharp from 'sharp'
 // import ffmpegInstaller from '@ffmpeg-installer/ffmpeg'
 // import ffmpeg from 'fluent-ffmpeg'
-import { Sticker, StickerTypes } from 'wa-sticker-formatter'
 import pino from "pino"
 
 

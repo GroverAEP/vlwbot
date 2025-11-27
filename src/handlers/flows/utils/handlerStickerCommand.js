@@ -1,11 +1,14 @@
 import fs from 'fs'
 // import ffmpeg from 'fluent-ffmpeg'
-import sharp from 'sharp'
+// import sharp from 'sharp'
 import { downloadMediaMessage } from '@whiskeysockets/baileys'
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
 import { Handler } from '../../../core/handler.js';
+// import { Image } from '@napi-rs/image';
+// import pkg from '@napi-rs/image';
+// const { Image } = pkg;
 
 // Configurar ffmpeg path correcto
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
@@ -13,7 +16,19 @@ ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 
 
-
+// let Sharp;
+// try {
+//     Sharp = await import('sharp'); // solo funciona si está instalado
+//     console.log("Usando Sharp nativo");
+// } catch (err) {
+//     try {
+//         Sharp = await import('@img/sharp-wasm32'); // solo si está instalado
+//         console.log("Usando Sharp WASM");
+//     } catch (err) {
+//         Sharp = null;
+//         console.log("Usando Jimp");
+//     }
+// }
 //////////////////////////////////////////////////
 // Cuarto Comando : Sticker
 // Uso: Creacion de Stickers de Imagenes y Videos
@@ -121,22 +136,117 @@ async function StickerCommand({msg,text,client,sock}){
         })
       } else {
         // 🖼️ Imagen → Sticker
-        console.log('🖼️ Procesando imagen para sticker...')
 
-          let safeBuffer = buffer;
-              try {
-                  await sharp(buffer)
-                  .resize(512, 512, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
-                  .toFormat("webp", { quality: 95, lossless: true })
-                  .toFile(tempOutput);
-              } catch (err) {
-                  console.warn("⚠️ Sharp detectó problema. Reintentando con buffer crudo...");
-                  safeBuffer = Buffer.from(buffer);
-                  await sharp(safeBuffer)
-                  .resize(512, 512)
-                  .toFormat("webp")
-                  .toFile(tempOutput);
-              }
+
+
+
+
+        
+        console.log('🖼️ Procesando imagen para sticker...')
+          //Utilizando el sharp
+          // let safeBuffer = buffer;
+          //     try {
+          //         await sharp(buffer)
+          //         .resize(512, 512, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+          //         .toFormat("webp", { quality: 95, lossless: true })
+          //         .toFile(tempOutput);
+          //     } catch (err) {
+          //         console.warn("⚠️ Sharp detectó problema. Reintentando con buffer crudo...");
+          //         safeBuffer = Buffer.from(buffer);
+          //         await sharp(safeBuffer)
+          //         .resize(512, 512)
+          //         .toFormat("webp")
+          //         .toFile(tempOutput);
+          //     }
+
+
+          //  //Utilizando jimp
+          //           try {
+          //     // Import dinámico correcto en ESM
+
+          //     // Leer la imagen desde el buffer
+          //     const image = await Jimp.read(buffer);
+
+          //     // Redimensionar a 512x512 manteniendo proporciones
+          //     image.contain(512, 512, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE);
+
+          //     // Guardar como WebP
+          //     await image.writeAsync(tempOutput);
+
+          // } catch (err) {
+          //     console.warn("⚠️ Error al procesar con Jimp:", err);
+
+          //     // Fallback simple
+          //     const jimpModule = await import('jimp');
+          //     const Jimp = jimpModule.default;
+
+          //     const image = await Jimp.read(Buffer.from(buffer));
+          //     image.resize(512, 512); // fallback sin proporción
+          //     await image.writeAsync(tempOutput);
+          // }
+
+          
+        // 🖼️ Imagen → sticker con @napi-rs/image
+        // console.log('🖼️ Procesando imagen para sticker...');
+        // try {
+        //     const img = Image.decode(buffer);
+        //     img.resize(512, 512);
+        //     const webpBuffer = img.encode('webp');
+        //     fs.writeFileSync(tempOutput, webpBuffer);
+        // } catch (err) {
+        //     console.error("⚠️ Error al procesar la imagen con @napi-rs/image:", err);
+        //     await client.send.reply(msg, '⚠️ Error al procesar la imagen para sticker.');
+        //     return;
+        // }
+
+        //uTILIZANDO FFMPEG
+
+        
+
+
+
+        try {
+
+
+
+
+          let ext = 'jpg'; // default
+          if (mediaMsg.mimetype) {
+              if (mediaMsg.mimetype.includes('png')) ext = 'png';
+              else if (mediaMsg.mimetype.includes('webp')) ext = 'webp';
+              else if (mediaMsg.mimetype.includes('jpeg')) ext = 'jpg';
+          }
+
+          const tempInput = path.join(tempFolder, `input.${ext}`);
+          fs.writeFileSync(tempInput, buffer);
+
+
+
+
+     await new Promise((resolve, reject) => {
+        ffmpeg(tempInput)
+            // quitar .inputFormat('png')
+            .outputOptions([
+                '-vf',
+                'scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000',
+                '-vcodec', 'libwebp',
+                '-lossless', '1',
+                '-preset', 'default',
+                '-loop', '0',
+                '-an'
+            ])
+            .output(tempOutput)
+            .on('end', resolve)
+            .on('error', reject)
+            .run();
+    });
+    console.log('✅ Sticker generado con FFmpeg');
+} catch (err) {
+    console.error('⚠️ Error al procesar la imagen con FFmpeg:', err);
+    await client.send.reply(msg, '⚠️ Error al crear el sticker.');
+}
+
+          
               }
 
         // 📌 Confirmar que el archivo realmente existe
@@ -157,6 +267,8 @@ async function StickerCommand({msg,text,client,sock}){
             if (fs.existsSync(tempOutput)) fs.unlinkSync(tempOutput)
             if (fs.existsSync(`${tempInput}.jpg`)) fs.unlinkSync(`${tempInput}.jpg`)
             if (fs.existsSync(`${tempInput}.mp4`)) fs.unlinkSync(`${tempInput}.mp4`)
+            if (fs.existsSync(`${tempOutput}.jpg`)) fs.unlinkSync(`${tempOutput}.jpg`)
+            if (fs.existsSync(`${tempOutput}.mp4`)) fs.unlinkSync(`${tempOutput}.mp4`)
             console.log('🧹 Archivos temporales eliminados')
           } catch (delErr) {
             console.warn('⚠️ Error al eliminar archivos temporales:', delErr)

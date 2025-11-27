@@ -1,11 +1,10 @@
 import fs from 'fs'
 // import ffmpeg from 'fluent-ffmpeg'
-import sharp from 'sharp'
 import { downloadMediaMessage } from '@whiskeysockets/baileys'
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
-
+import { Jimp } from 'jimp';
 // Configurar ffmpeg path correcto
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 // import { Sticker, StickerTypes } from 'wa-sticker-formatter'
@@ -94,21 +93,43 @@ export async function handleStickerCommand({sock,msg,sender,text}) {
       } else {
         // 🖼️ Imagen → Sticker
         console.log('🖼️ Procesando imagen para sticker...')
+          //utilizando sharp
+          // let safeBuffer = buffer;
+          //     try {
+          //         await sharp(buffer)
+          //         .resize(512, 512, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+          //         .toFormat("webp", { quality: 95, lossless: true })
+          //         .toFile(tempOutput);
+          //     } catch (err) {
+          //         console.warn("⚠️ Sharp detectó problema. Reintentando con buffer crudo...");
+          //         safeBuffer = Buffer.from(buffer);
+          //         await sharp(safeBuffer)
+          //         .resize(512, 512)
+          //         .toFormat("webp")
+          //         .toFile(tempOutput);
+          //     }
 
-          let safeBuffer = buffer;
-              try {
-                  await sharp(buffer)
-                  .resize(512, 512, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
-                  .toFormat("webp", { quality: 95, lossless: true })
-                  .toFile(tempOutput);
-              } catch (err) {
-                  console.warn("⚠️ Sharp detectó problema. Reintentando con buffer crudo...");
-                  safeBuffer = Buffer.from(buffer);
-                  await sharp(safeBuffer)
-                  .resize(512, 512)
-                  .toFormat("webp")
-                  .toFile(tempOutput);
-              }
+
+          //utilizando jimp
+                    
+          try {
+              // Leer la imagen desde el buffer
+              const image = await Jimp.read(buffer);
+
+              // Redimensionar a 512x512 manteniendo la proporción y centrado
+              image.cover(512, 512, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE);
+
+              // Guardar como webp
+              await image.writeAsync(tempOutput);
+
+              console.log('✅ Imagen procesada con Jimp para sticker');
+
+          } catch (err) {
+              console.error('⚠️ Error procesando imagen con Jimp:', err);
+              await client.send.reply(msg, '⚠️ No se pudo procesar la imagen para sticker. Asegúrate de enviar una imagen válida.');
+          }
+
+
               }
 
       // 📌 Confirmar que el archivo realmente existe
