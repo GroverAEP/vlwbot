@@ -9,19 +9,15 @@ import pino from "pino"
 
 import path from "path";
 
-import { Sender } from "./src/class/sender.js";
-import { config } from "./src/config/index.js";
-import { DB_LOCAL } from './src/database/models/db.js';
+import { Sender } from "./src/core/models/sender.js";
+import { config } from "./src/core/config/index.js";
+import { DB_LOCAL } from './src/core/models/db.js';
 import { all } from 'axios'
-import { dispatchHandlers } from './src/handlers/message/handlerDispatch.js'
+import { dispatchHandlers } from './src/core/dispatcher/handlerDispatch.js'
 import { middleware } from './src/core/middleware/index.js'
-import { Owners } from './src/core/owners.js'
-import { Admins } from './src/core/admins.js'
-import { Users } from './src/core/users.js'
-import { downloadYoutubeMp3 } from './src/services/youtubeServices/getMp3Url.js'
-import { deleteFile } from './src/utils/deleteFile.js'
-import { downloadBiliVideo } from './src/services/BilibiliServices/getVideo.js'
-import { downloadYoutubeVideo } from './src/services/youtubeServices/getVideoUrl.js'
+import { Owners } from './src/core/models/owners.js'
+import { Admins } from './src/core/models/admins.js'
+import { Users } from './src/core/models/user.js'
 
 // ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 const processedMessages = new Set();
@@ -32,7 +28,7 @@ let client;  // ← declarar variable globalmente (una sola vez)
 
 async function startBot() {
   //Variables iniciales Const 
-  const { state, saveCreds } = await useMultiFileAuthState('./src/auth')
+  const { state, saveCreds } = await useMultiFileAuthState(config.routes.PATH_AUTH)
   const { version } = await fetchLatestBaileysVersion()
   const deletedMessages = {}; 
   
@@ -481,12 +477,57 @@ async function handleCommands(msg, text, client) {
     const args = text.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
+    if (!msg || !msg.key || !msg.key.remoteJid) {
+        console.log("Mensaje ignorado: no tiene remoteJid");
+        return;
+    }
 
-    
+    const chatId = msg.key.remoteJid;
+
     if (command === 'ping') {
       await client.send.reply(msg, 'Pong!');
     }
     
+if (command === 'listsend') {
+    try {
+        const mensajeLista = {
+            listMessage: {
+                title: 'Menú de Opciones',
+                description: 'Por favor selecciona una opción del siguiente menú:',
+                buttonText: 'Ver Menú',
+                footerText: 'Selecciona una de las opciones disponibles',
+                sections: [
+                    {
+                        title: 'Comandos Disponibles',
+                        rows: [
+                            {
+                                title: 'Información',
+                                rowId: 'info',
+                                description: 'Obtener información del bot'
+                            },
+                            {
+                                title: 'Ayuda',
+                                rowId: 'ayuda',
+                                description: 'Ver todas las opciones disponibles'
+                            },
+                            {
+                                title: 'Configuración',
+                                rowId: 'config',
+                                description: 'Configurar opciones del bot'
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        await client.sock.sendMessage(chatId, mensajeLista, {});        
+    } catch (error) {
+        console.error('Error al enviar lista:', error);
+        await client.sock.sendMessage(chatId, { text: 'Error al enviar el menú. Inténtalo de nuevo.' });
+    }
+}
+
     if (command === 'menu') {
       await client.send.reply(msg, `
           *MI BOT PRO 2025*
@@ -500,17 +541,12 @@ async function handleCommands(msg, text, client) {
         
         const VIDEO = client.config.routes.PATH_VIDEO;
         
-        const chatId = msg.key.remoteJid;
         
         // Comando !mp3
         console.log(text)
         // Comando !bl
-      
-            
-
-
-
-        dispatchHandlers(msg,text,client,sock);
+     
+        dispatchHandlers(msg,text,client);
 
     }
 

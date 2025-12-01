@@ -1,0 +1,22 @@
+{
+  "chats": [
+    {
+      "id": "120363404032641551@g.us",
+      "nombre": "General",
+      "status": "allowed",
+      "admins": [
+        "122050287034452@lid"
+      ]
+    },
+    {
+      "id": "120363220634467964@g.us",
+      "nombre": "EL Hipódromo camino al GOTY",
+      "status": "allowed",
+      "admins": [
+        "80204319994055@lid",
+        "70330240528562@lid",
+        "181904884117711@lid"
+      ]
+    }
+  ]
+}
