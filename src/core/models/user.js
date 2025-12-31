@@ -2,7 +2,7 @@ import fs from "fs-extra";
 
 export class Users {
     constructor(dbPath) {
-        this.dbPath = `${dbPath}users.json`;
+        this.dbPath = `${dbPath}/users.json`;
     }
 
     async load() {

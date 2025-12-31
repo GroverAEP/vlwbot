@@ -3,7 +3,9 @@
 import { isAdminGroup } from "./isAdminGroup.js";
 import { isBanned } from "./isBanned.js";
 import { isGroup } from "./isGroup.js";
+import { isUser } from "./isUser.js"
 import isOwner from "./isOwner.js";
+
 
 
 
@@ -14,5 +16,5 @@ export const middleware = {
     isGroup,
     isOwner,
     isAdminGroup,
-
+    isUser
 };

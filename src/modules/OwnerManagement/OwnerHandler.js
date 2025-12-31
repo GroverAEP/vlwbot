@@ -1,39 +1,65 @@
+import { banUsers } from "./handlers/flows/handlerBan.js";
+import { handlerShowDeleteMessage, ShowDeleteMessage } from "./handlers/flows/handlerShowDeleteMessage.js";
 
-export default class InventoryHandler {
+export default class OwnerHandler {
     constructor(client) {
-        super(client);
-        this.name = "inventory";
-        this.role = "admin";
+        this.client = client
+        this.name = "OwnerHandler";
+        this.role = "owner";
         this.triggers = {
-                    add:["add","agregar"],
-                    delete:["delete","eliminar"],
-                    update:["update",actualizar],
-                    sell:["sell","vender"]
+                    banUsers:{
+                        lg: "Banear el uso del bot a usuarios especificos",
+                        cmd : ["ban","banUsers"],
+                        example: "!ban @mention"
+                    },
+                    ShowDeleteMessage:{
+                        lg: "Ver mensajes eliminados en un grupo",
+                        cmd: ["ShowDelMsg"],
+                        example: "!ShowDelMsg"
+                    },
+                    // update:["update",actualizar],
+                    // sell:["sell","vender"]
                 }
 
         // this.inventoryService = new InventoryService();
+    }
+    async help(){
+        let texto = "👑 *_Comandos de owners_* \n\n";
+
+        for (const key in this.triggers) {
+            const { lg, cmd, example } = this.triggers[key];
+            texto += `• *${key}*\n`;
+            texto += `  ├ Alias: ${cmd.join(", ")}\n`;
+            texto += `  └ Uso: ${lg}\n`;
+            texto += `  └ Ejemplo: ${example}\n\n`
+
+        }
+
+        return texto; 
     }
 
     async run({ msg, text }) {
         const action = ActionParser.detect(text);
         const words = text.toUpperCase().split(" "); 
-        const codigo = words[1]; 
+        const cmd = words[1]; 
 
         switch (action) {
-            case "add":
-                return this.addProduct(msg, text);
+            case "banUsers":
+                return banUsers(msg, this.client, cmd);
 
-            case "delete":
-                return this.deleteProduct(msg, codigo);
+            case "showDeleteMessage":
+                return handlerShowDeleteMessage(msg,this.client, cmd);
+            
+            
+            // case "upda":
+            //     return this.updateProduct(msg, codigo);
 
-            case "update":
-                return this.updateProduct(msg, codigo);
-
-            case "list":
-                return this.listProducts(msg);
+            // case "list":
+            //     return this.listProducts(msg);
 
             default:
-                return this.reply(msg, "⚠️ Acción no reconocida en INVENTARIO.");
+                console.log("Comandos Owners no usados.")
+                // return this.reply(msg, "⚠️ Acción no reconocida en INVENTARIO.");
         }
     }
 
@@ -96,18 +122,31 @@ export default class InventoryHandler {
 
 export  class ActionParser {
     static detect(text, triggers) {
-        const words = text.toLowerCase().split(" ");
-        // Recorre cada acción y sus triggers
-        for (const action in triggers) {
-            const triggerList = triggers[action];
+         if (!text || typeof text !== "string") return null;
 
-            for (const word of words) {
-                if (triggerList.includes(word)) {
-                    return action; // add, delete, update, sell, etc.
-                }
+        const cleanText = text.toLowerCase().trim();
+
+        // ✅ Solo toma la primera palabra como comando
+        const command = cleanText.split(/\s+/)[0];
+
+        for (const action in triggers) {
+             const triggerData = triggers[action];
+
+            // seguridad extra
+            if (!triggerData?.cmd || !Array.isArray(triggerData.cmd)) continue;
+
+            const triggerList = triggerData.cmd.map(t => t.toLowerCase());
+
+            if (triggerList.includes(command)) {
+                return {
+                    action, // ej: "sayed"
+                    cmd     // ej: "hola como estas"
+                };
             }
         }
 
-        return null; // nada coincide
+        console.log(`${command} no coincide con los triggers`);
+        return { action: null, cmd: null };
+
     }
 }

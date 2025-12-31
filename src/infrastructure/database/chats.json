@@ -1,21 +1,51 @@
 {
   "chats": [
     {
-      "id": "120363404032641551@g.us",
-      "nombre": "General",
+      "id": "120363278803923652@g.us",
+      "nombre": "familia juguito🧃🧃🧃🧃",
       "status": "allowed",
+      "showDelete": false,
       "admins": [
-        "122050287034452@lid"
+        {
+          "id": "122050287034452@lid",
+          "role": "admin"
+        }
       ]
     },
     {
       "id": "120363220634467964@g.us",
-      "nombre": "EL Hipódromo camino al GOTY",
+      "nombre": "¡UMAZING👍GOTY WINNERS!",
       "status": "allowed",
+      "showDelete": false,
       "admins": [
-        "80204319994055@lid",
-        "70330240528562@lid",
-        "181904884117711@lid"
+        {
+          "id": "80204319994055@lid",
+          "role": "admin"
+        },
+        {
+          "id": "70330240528562@lid",
+          "role": "admin"
+        },
+        {
+          "id": "248038790590621@lid",
+          "role": "admin"
+        },
+        {
+          "id": "181904884117711@lid",
+          "role": "admin"
+        }
+      ]
+    },
+    {
+      "id": "120363404032641551@g.us",
+      "nombre": "General",
+      "status": "allowed",
+      "showDelete": false,
+      "admins": [
+        {
+          "id": "122050287034452@lid",
+          "role": "superadmin"
+        }
       ]
     }
   ]

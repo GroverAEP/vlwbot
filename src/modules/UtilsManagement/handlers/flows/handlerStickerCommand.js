@@ -103,9 +103,6 @@ async function StickerCommand({msg,client}){
     }
 
 
-    console.log(msg)
-    console.log(mediaMsg)
-
     console.log('🟡 Media detectada →', Object.keys(mediaMsg)[0])
 
     try {
@@ -305,7 +302,8 @@ async function StickerCommand({msg,client}){
         }, 1000)
       } catch (err) {
         console.error('❌ Error al crear sticker:', err)
-        await client.send.reply(msg,ErrorStickerMessage.Default(), msg)
+        await client.send.reply(msg,ErrorStickerMessage.Default(), msg);
+        return;
     }
     }
 
@@ -344,7 +342,7 @@ async function  extractMedia(msg) {
   
     return null
   } catch (err){
-    console.error('❌ Error al crear sticker:', err)
+    console.error('❌ Error al crear sticker extrac message:', err)
     await sock.sendMessage(sender, {
       text: '⚠️ Error el mensaje no llego.'
     })

@@ -1,16 +1,12 @@
 # Imagen base de Node.js
 FROM node:20
 
-
 #Modulo para obtener los videos 
 #python 
 #pip install yt-dlp 
 
 # Instalar dependencias de Python + yt-dlp desde apt
 RUN apt update && apt install -y python3 python3-pip yt-dlp
-
-
-
 
 # Crear directorio en el contenedor
 WORKDIR /app

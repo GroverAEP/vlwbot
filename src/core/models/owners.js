@@ -2,7 +2,7 @@ import fs from "fs-extra";
 
 export class Owners {
     constructor(dbPath) {
-        this.dbPath = `${dbPath}owners.json`;
+        this.dbPath = `${dbPath}/owners.json`;
     }
 
     async load() {
@@ -35,8 +35,16 @@ export class Owners {
     isOwner(ownerId) {
         // Función auxiliar para normalizar IDs, sacando los dígitos antes de ":"
         const normalizeId = (id) => {
+            console.log(normalizeId)
             if (!id || typeof id !== 'string') return '';
-            return id.replace(/\D/g, '') || id.split('@')[0].split(':')[0] || '';
+            
+            // Quitar todo lo que venga después de “@”
+            let base = id.split('@')[0];
+
+            // Quitar todo lo que venga después de “:”
+            base = base.split(':')[0];
+            
+            return base;
         };
 
         const idNomalized = normalizeId(ownerId);

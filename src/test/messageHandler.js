@@ -7,7 +7,7 @@ async function messageHandler(sock, msg, store) {
   try {
     // ====== EXTRAER TEXTO DE FORMA SEGURA (nunca explota) ======
     let text = '';
-
+    
     if (msg.message) {
       const m = msg.message;
 

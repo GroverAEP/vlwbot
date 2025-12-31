@@ -32,8 +32,8 @@ export class Sender {
 
 
 
-    async text(jid, text = "", quoted = null) {
-
+    async text(msg, text = "", quoted = null) {
+        const jid =msg.key.remoteJid
         const safeText = (typeof text === "string") ? text : String(text ?? "");
     
         return await this.sock.sendMessage(jid, { 
@@ -43,7 +43,7 @@ export class Sender {
     }
 
     async reply(msg, text) {
-        return await this.text(msg.key.remoteJid, text, msg);
+        return await this.text(msg, text, msg);
     }
  
     async audio(msg, bufferOrUrl, options = {}) {
@@ -72,6 +72,8 @@ export class Sender {
                 caption = ""
             } = options;
 
+
+            
         return await this.sock.sendMessage(jid, {
             image: typeof bufferOrUrl === 'string' ? { url: bufferOrUrl } : bufferOrUrl,
             caption: caption ? `${caption}\n\n_${this.footer}_` : this.footer
@@ -99,7 +101,7 @@ export class Sender {
 
         return await this.sock.sendMessage(jid, {
             video: buffer,
-            caption: caption ? `${caption}\n\n_${this.footer}_` : this.footer,
+            caption: caption ? `${caption}` : this.footer,
             gifPlayback: gif
         });
     }
@@ -138,6 +140,34 @@ export class Sender {
     }
 
     
+    async buttonsEditable(msg, options = {}) {
+    const jid = msg.key.remoteJid;
+
+    const {
+        text = "",
+        footer = this.footer,
+        buttons = [],   // [{ id, text }]
+        quoted = null
+    } = options;
+
+    if (!Array.isArray(buttons) || buttons.length === 0) {
+        throw new Error("Debes enviar al menos un botón");
+    }
+
+    const formattedButtons = buttons.map((btn, i) => ({
+        buttonId: btn.id ?? String(i + 1),
+        buttonText: { displayText: btn.text ?? `Botón ${i + 1}` },
+        type: 1
+    }));
+
+    return await this.sock.sendMessage(jid, {
+        text: `${text}\n\n_${footer}_`,
+        buttons: formattedButtons,
+        headerType: 1
+    }, { quoted });
+}
+
+
     // Delay anti-ban
     async wait() {
         await delay(this.delayMs);

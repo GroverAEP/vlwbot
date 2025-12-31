@@ -2,19 +2,12 @@
 export const handlerBan = {
     name: "ban",
     role: "owner",
-    run: bannedUsers,
+    run: banUsers,
 };
 
-export async function bannedUsers({msg,text,client,sock}) {
+export async function banUsers({msg,client,cmd}) {
     try{
-        const PREFIX = client.config.defaults.prefix;
-        const triggers = [`${PREFIX}b`, `${PREFIX}ban`];
-
-        const normalize = str => str.trim().toLowerCase();
-
-        // Verifica si el texto empieza con alguno de los triggers
-        const withStart = triggers.some(t => normalize(text).startsWith(normalize(t)));
-        if (!withStart) return;
+        // if (!withStart) return;
             
 
         const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
@@ -55,12 +48,12 @@ export async function bannedUsers({msg,text,client,sock}) {
 
 // Método para banear un usuario
 export function banUser(userId) {
-    bannedUsers.add(userId);
+    banUsers.add(userId);
     return true;
 }
 
 // Método para desbanear
 export function unbanUser(userId) {
-    bannedUsers.delete(userId);
+    banUsers.delete(userId);
     return true;
 }

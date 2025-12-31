@@ -7,6 +7,7 @@ export class DB_LOCAL {
             chats: `${this.dbPath}/chats.json`,
             users: `${this.dbPath}/users.json`,
             owners: `${this.dbPath}/owners.json`,
+            clients : `${this.dbPath}/clients.json`,
             products: `${this.dbPath}/products.json`,
             reports: `${this.dbPath}/reports.json`,
             sales : `${this.dbPath}/sales.json`

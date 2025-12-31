@@ -16,8 +16,16 @@ export  class ErrorStickerMessage {
 }
 
 export class ErrorPokemonMessage {
-    static render({detail}){
-        return '❌ Envía o responde a una imagen o video (mp4, mov, mkv, webm) con el comando *!sticker*'
+    static NotFoundNamed({detail}){
+        return 'Debes escribir un Pokémon.\nEjemplo: `!pokemon pikachu'
+    }
+
+    static NotFoundPokemonOrBadApi(){
+        return '❌ Pokémon no encontrado o error en la API.'
+    }
+
+    static NotFoundImage(){
+        return '❌ No encontré imagen del Pokémon.'
     }
 
 }

@@ -3,77 +3,146 @@
     {
       "id": "80204319994055@lid",
       "name": "Rolando",
-      "chatId": "120363220634467964@g.us",
+      "chats": [
+        "120363220634467964@g.us",
+        "120363278803923652@g.us",
+        "120363198022112318@g.us"
+      ],
       "status": "allow",
       "role": "user"
     },
     {
       "id": "70330240528562@lid",
       "name": "Angel・天使",
-      "chatId": "120363220634467964@g.us",
-      "status": "allow",
-      "role": "user"
-    },
-    {
-      "id": "80204319994055@lid",
-      "name": "Rolando",
-      "chatId": "120363278803923652@g.us",
-      "status": "allow",
-      "role": "user"
-    },
-    {
-      "id": "122050287034452@lid",
-      "name": "espino",
-      "chatId": "120363278803923652@g.us",
-      "status": "allow",
-      "role": "user"
-    },
-    {
-      "id": "122050287034452@lid",
-      "name": "espino",
-      "chatId": "120363198022112318@g.us",
-      "status": "allow",
-      "role": "user"
-    },
-    {
-      "id": "122050287034452@lid",
-      "name": "espino",
-      "chatId": "120363220634467964@g.us",
+      "chats": [
+        "120363220634467964@g.us"
+      ],
       "status": "allow",
       "role": "user"
     },
     {
       "id": "101253904347168@lid",
       "name": "Hoshizora",
-      "chatId": "120363198022112318@g.us",
-      "status": "allow",
-      "role": "user"
-    },
-    {
-      "id": "122050287034452@lid",
-      "name": "espino",
-      "chatId": "120363404032641551@g.us",
+      "chats": [
+        "120363198022112318@g.us"
+      ],
       "status": "allow",
       "role": "user"
     },
     {
       "id": "223703807844598@lid",
       "name": "れいど",
-      "chatId": "120363198022112318@g.us",
-      "status": "allow",
-      "role": "user"
-    },
-    {
-      "id": "80204319994055@lid",
-      "name": "Rolando",
-      "chatId": "120363198022112318@g.us",
+      "chats": [
+        "120363198022112318@g.us"
+      ],
       "status": "allow",
       "role": "user"
     },
     {
       "id": "122050287034452@lid",
       "name": "espino",
-      "chatId": "51960847908-1588007415@g.us",
+      "chats": [
+        "120363404032641551@g.us"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "130967008223322@lid",
+      "name": "espino",
+      "chats": [
+        "130967008223322@lid"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "122050287034452@lid"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "122050287034452@lid"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "122050287034452@lid"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "120363404032641551@g.us"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "120363404032641551@g.us"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "120363404032641551@g.us"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "120363404032641551@g.us"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "120363404032641551@g.us"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "120363404032641551@g.us"
+      ],
+      "status": "allow",
+      "role": "user"
+    },
+    {
+      "id": "122050287034452@lid",
+      "name": "espino",
+      "chats": [
+        "120363404032641551@g.us"
+      ],
       "status": "allow",
       "role": "user"
     }
