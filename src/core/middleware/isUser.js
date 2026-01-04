@@ -11,3 +11,8 @@ export async function isUser({msg,userId}) {
     }
     return false;
 }
+
+// ¿Es cliente? (solo botones, NO comandos de texto)
+export function isUserD(userRole) {
+    return userRole === 'user';
+}

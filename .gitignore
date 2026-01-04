@@ -4,3 +4,5 @@ dist/
 .dockerignore
 .Dockerfile
 .git
+node_modules
+package-lock.json

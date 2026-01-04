@@ -30,7 +30,24 @@ const handlers = [
 //Si es owner
 
 
-export const dispatchHandlers = async (msg,text,client) => {
+
+
+
+
+
+
+
+
+
+
+
+export const dispatchHandlers = async ({msg,cleanText,client}) => {
+    //obtiene el prefijo de comandos
+    const prefix = client.config.defaults.prefix;
+    
+    if (!cleanText.startsWith(prefix)) return;
+    //Si no empieza con el prefijo,  
+    const text = cleanText.slice(prefix.length).trim();
     //Cargan los owners, admins , users
     const owners = await client.manager.owners.load()
     const admins = await client.manager.admins.load()
@@ -45,9 +62,9 @@ export const dispatchHandlers = async (msg,text,client) => {
     console.log(normalizado)
     console.log(chatId)
 
-    const allowedChats = await client.manager.chats.load()
+    const allowedGroups = await client.manager.groups.load()
     const allowedUsers = await client.manager.users.load()
-    console.log(allowedChats)
+    console.log(allowedGroups)
     console.log(allowedUsers)
     
     // ---------- Identificar Es un grupo o un usuario midleware -------------------------
@@ -58,7 +75,7 @@ export const dispatchHandlers = async (msg,text,client) => {
     console.log(isUser)
 
     //Valida el grupo o el usuario permitido
-    let chat = await isGroup ? allowedChats.find(c => c.id === chatId) : null;
+    let chat = await isGroup ? allowedGroups.find(c => c.id === chatId) : null;
     let user = await isUser ? allowedUsers.find(u => u.id === userId) : null;
     
     //Verifica que si el usuario es el Owner o un admin o un User
@@ -114,8 +131,8 @@ export const dispatchHandlers = async (msg,text,client) => {
                     admins: admins 
                 };
     
-                allowedChats.push(newChat);
-                await client.db.local.save("chats", allowedChats);
+                allowedGroups.push(newChat);
+                await client.db.local.save("chats", allowedGroups);
                 await client.send.reply(msg, `✅ Bot activado en el ${groupName}`);
                 return;
             }

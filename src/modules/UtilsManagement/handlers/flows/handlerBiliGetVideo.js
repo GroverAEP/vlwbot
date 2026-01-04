@@ -12,6 +12,7 @@ export async function biliGetVideo({msg,client,cmd}) {
         if (!cmd) return await client.send.reply(msg, "❌ Debes escribir un enlace o nombre de video.");
         
            await client.send.reply(msg, "📥 Descargando video, espera...");
+           
            const filePath = await downloadBiliVideo(cmd);
            await client.send.video(msg,{ url: filePath } , {caption: `Aquí está tu video de BiliBili 🎬`} );
            // setTimeout(() => deleteFile(filePath), 5000);

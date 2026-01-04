@@ -14,6 +14,9 @@ WORKDIR /app
 # Copiar package.json y package-lock.json
 COPY package*.json ./
 
+# Variables de entorno por defecto
+ENV NODE_ENV=production
+ENV PORT=3000
 
 
 # Instalar dependencias

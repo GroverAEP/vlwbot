@@ -62,6 +62,7 @@ export class Sender {
         }, { quoted });
     }
 
+    
     async image(msg, bufferOrUrl, options = {}) {
         const jid = msg.key.remoteJid;
         const {
@@ -105,6 +106,27 @@ export class Sender {
             gifPlayback: gif
         });
     }
+
+    async document(msg, buffer, options = {}){
+        const jid = msg.key.remoteJid;
+        const {
+                ptt = false,     // valor por defecto
+                quoted = null,   // valor por defecto
+                waveform = null,
+                seconds = 0,
+                gif = false,
+                mimetype = "",
+                fileName = "default",
+                caption = "",
+            } = options;
+        return await this.sock.sendMessage(jid, {
+                document: buffer,
+                mimetype: mimetype,
+                fileName: fileName,
+                caption: caption
+            },{ quoted });
+    }
+
 
     async sticker(jid, buffer, options ={}) {
         const {

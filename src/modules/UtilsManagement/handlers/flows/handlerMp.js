@@ -1,5 +1,6 @@
 import { deleteFile } from "../../../../infrastructure/utils/deleteFile.js";
 import { downloadYoutubeMp3 } from "../../services/Youtube/getMp3Url.js";
+import { SuccessMp3GetAudio } from "../messages/SuccessMessage.js";
 
 export const handlerMp3= {
     name: "mp3",
@@ -20,17 +21,24 @@ async function mp3({msg,client,cmd}) {
         // Si query existe ejecuta todo esto.
         await client.send.reply(msg, "📥 Descargando Audio, espera...");
         try {
-            const filePath = await downloadYoutubeMp3(cmd);
+            // console.log("Entrando al metodo downloadYoutube")
+            const {metadata,finalPath,peso} = await downloadYoutubeMp3(cmd);
             // await client.send.audio(sender,filePath,msg);
             
+            const successMessage = new SuccessMp3GetAudio(metadata.platform);
 
-                await client.send.audio(msg, filePath,{quoted: msg});
+            const msgGenerateMessage = successMessage.generateMessage(metadata,peso);
 
-            setTimeout(() => deleteFile(filePath), 5000);
+            const infoaudio = await client.send.reply(msg, msgGenerateMessage);
+            // .then(async ()=>{
+                // });
+            await client.send.audio(infoaudio, finalPath,{quoted: infoaudio}).then(async()=>{
+                await setTimeout(() => deleteFile(finalPath), 5000);
+            });
+                
         } catch (err) {
             await client.send.reply(msg, `❌ Error al descargar el audio. ${err}\n - 
                 Utiliza: !mp3 {url - nombre}`);
-            //elimina la carpeta de auth y vuelve a ejecutra el npm run
             console.error(err);
         }
 

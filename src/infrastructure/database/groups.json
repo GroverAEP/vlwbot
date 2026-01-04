@@ -1,0 +1,166 @@
+{
+  "groups": [
+    {
+      "id": "120363404032641551@g.us",
+      "name": "General",
+      "status": "allowed",
+      "settings": {
+        "welcomeEnabled": false,
+        "welcomeMessage": "¡Bienvenido @{user} al grupo {subject}! 👋",
+        "goodbyeEnabled": false,
+        "goodbyeMessage": "¡@{user} ha abandonado el grupo! 👋",
+        "showDelete": false,
+        "antiLink": false,
+        "antiSpam": false,
+        "maxWarnings": 3,
+        "autoMute": false,
+        "onlyAdmins": false,
+        "modeNsfw": false
+      },
+      "admins": [
+        "122050287034452@lid"
+      ],
+      "partipants": [
+        {
+          "id": "122050287034452@lid",
+          "jid": "51928250746@s.whatsapp.net",
+          "lid": "122050287034452@lid",
+          "admin": "superadmin"
+        }
+      ],
+      "owner": "122050287034452@lid",
+      "creation": 1767548890,
+      "participantsCount": 1,
+      "lastActivity": 1767548890,
+      "warnings": {},
+      "bannedUsers": [],
+      "isCommunity": false,
+      "linkedGroupJid": null,
+      "isAnnounce": false
+    },
+    {
+      "id": "120363220634467964@g.us",
+      "name": "¡UMAZING👍GOTY WINNERS!",
+      "status": "allowed",
+      "settings": {
+        "welcomeEnabled": false,
+        "welcomeMessage": "¡Bienvenido @{user} al grupo {subject}! 👋",
+        "goodbyeEnabled": false,
+        "goodbyeMessage": "¡@{user} ha abandonado el grupo! 👋",
+        "showDelete": false,
+        "antiLink": false,
+        "antiSpam": false,
+        "maxWarnings": 3,
+        "autoMute": false,
+        "onlyAdmins": false,
+        "modeNsfw": false
+      },
+      "admins": [
+        "80204319994055@lid",
+        "70330240528562@lid",
+        "181904884117711@lid"
+      ],
+      "partipants": [
+        {
+          "id": "137353087742037@lid",
+          "jid": "593982833891@s.whatsapp.net",
+          "lid": "137353087742037@lid",
+          "admin": null
+        },
+        {
+          "id": "184331658113253@lid",
+          "jid": "59172003402@s.whatsapp.net",
+          "lid": "184331658113253@lid",
+          "admin": null
+        },
+        {
+          "id": "87217951260689@lid",
+          "jid": "5491130152182@s.whatsapp.net",
+          "lid": "87217951260689@lid",
+          "admin": null
+        },
+        {
+          "id": "179087284941054@lid",
+          "jid": "5219992250809@s.whatsapp.net",
+          "lid": "179087284941054@lid",
+          "admin": null
+        },
+        {
+          "id": "101494925873214@lid",
+          "jid": "5219241235167@s.whatsapp.net",
+          "lid": "101494925873214@lid",
+          "admin": null
+        },
+        {
+          "id": "20053353353381@lid",
+          "jid": "5217621012283@s.whatsapp.net",
+          "lid": "20053353353381@lid",
+          "admin": null
+        },
+        {
+          "id": "53176174698715@lid",
+          "jid": "5215527612092@s.whatsapp.net",
+          "lid": "53176174698715@lid",
+          "admin": null
+        },
+        {
+          "id": "181694514597912@lid",
+          "jid": "5214831217234@s.whatsapp.net",
+          "lid": "181694514597912@lid",
+          "admin": null
+        },
+        {
+          "id": "43465220034632@lid",
+          "jid": "5214651037602@s.whatsapp.net",
+          "lid": "43465220034632@lid",
+          "admin": null
+        },
+        {
+          "id": "154125186638053@lid",
+          "jid": "51993505358@s.whatsapp.net",
+          "lid": "154125186638053@lid",
+          "admin": null
+        },
+        {
+          "id": "80204319994055@lid",
+          "jid": "51960295724@s.whatsapp.net",
+          "lid": "80204319994055@lid",
+          "admin": "admin"
+        },
+        {
+          "id": "70330240528562@lid",
+          "jid": "51946650245@s.whatsapp.net",
+          "lid": "70330240528562@lid",
+          "admin": "admin"
+        },
+        {
+          "id": "122050287034452@lid",
+          "jid": "51928250746@s.whatsapp.net",
+          "lid": "122050287034452@lid",
+          "admin": null
+        },
+        {
+          "id": "95189712543777@lid",
+          "jid": "51913108237@s.whatsapp.net",
+          "lid": "95189712543777@lid",
+          "admin": null
+        },
+        {
+          "id": "181904884117711@lid",
+          "jid": "12816915097@s.whatsapp.net",
+          "lid": "181904884117711@lid",
+          "admin": "admin"
+        }
+      ],
+      "owner": "248038790590621@lid",
+      "creation": 1767564555,
+      "participantsCount": 15,
+      "lastActivity": 1767564555,
+      "warnings": {},
+      "bannedUsers": [],
+      "isCommunity": false,
+      "linkedGroupJid": null,
+      "isAnnounce": false
+    }
+  ]
+}

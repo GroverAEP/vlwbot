@@ -12,3 +12,7 @@ export async function isGroup({ msg,chatId,chat }) {
       return false;
     }
 }
+
+// export function isGroupD(userRole){
+//       return userRole === "group"
+// }
