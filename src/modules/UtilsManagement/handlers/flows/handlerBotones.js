@@ -32,14 +32,14 @@ export async function botones({msg,client,cmd}) {
           ]
         }]
     }) },
+  ]
+  });
     
     // {
 //   additionalNodes: [ { tag: 'biz', attrs: { experimental_flag: '1' } } ] // will be merged before auto interactive nodes
 // }
 
         // { name: 'cta_catalog', buttonParamsJson: JSON.stringify({}) }
-    ]
-    });
     await sendButtons(sock, jid, {
   title: 'Header Title',            // optional header
   text: 'Pick one option below',    // body

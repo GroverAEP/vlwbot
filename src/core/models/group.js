@@ -37,7 +37,7 @@ export class Group {
         const group = {
             id: id,
             name: name,
-            status: "allowed",
+            status: "",
             settings: {
                 welcomeEnabled: false,                 // Enviar mensaje de bienvenida
                 welcomeMessage: "¡Bienvenido @{user} al grupo {subject}! 👋", // Mensaje personalizado
@@ -145,6 +145,48 @@ export class Group {
         await this.save();
     }
 
+    async allowedGroup({groupId}) {
+        console.log(`🔄 allowedGroup llamado para: ${groupId}`);
+    
+        await this.load();
+        console.log(`📂 Grupos cargados: ${this.groups.length}`);
+        
+        const group = this.groups.find(u =>{
+           console.log(groupId);
+           console.log(u.id)
+           
+            return u.id === groupId;
+
+        } );
+        if (!group) {
+            console.log(`❌ Grupo NO encontrado: ${groupId}`);
+            return false;
+        }
+        
+        console.log(`✅ Grupo encontrado:`, { id: group.id, status: group.status });
+        group['status'] = 'allowed';
+        console.log(`✏️ Status actualizado en memoria: ${group.status}`);
+        
+        try {
+            await this.save();
+            console.log(`💾 save() ejecutado SIN errores`);
+        } catch (error) {
+            console.error(`💥 ERROR en save():`, error);
+            return false;
+        }
+        
+        // Verificar que se guardó
+        await this.load();
+        const verify = this.groups.find(u => u.id === groupId);
+        console.log(`🔍 VERIFICACIÓN FINAL:`, verify?.status || 'NO ENCONTRADO');
+        
+        return true;
+    }
+    
+    
+
+
+
     async update(userId, key, value) {
         await this.load();
         const group = this.groups.find(u => u.id === userId);
@@ -164,6 +206,19 @@ export class Group {
         if (!group) return false;
         return group[field] === value;
     }
+    
+       // --- Nuevo método equals ---
+   async vefGroupAllowed(groupId) {
+        await this.load();
+
+        const group = this.groups.find(u => u.id === groupId);
+        if (!group) return false;
+        // console.log(group);
+        // console.log(!(group["status"] === "allowed"));
+        return group["status"] === "allowed";
+    }
+    
+
 
 
     isUser(userId) {

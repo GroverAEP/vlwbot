@@ -6,7 +6,12 @@
       "private_chat": null,
       "group_chats": [
         "120363404032641551@g.us",
-        "120363220634467964@g.us"
+        "120363220634467964@g.us",
+        "120363278803923652@g.us",
+        "51960847908-1588007415@g.us",
+        "120363325430263898@g.us",
+        "120363405108718544@g.us",
+        "120363276566084927@g.us"
       ],
       "status": "allow",
       "role": "client"
@@ -14,6 +19,33 @@
     {
       "id": "51960295724@s.whatsapp.net",
       "name": "espino",
+      "private_chat": null,
+      "group_chats": [
+        "120363278803923652@g.us",
+        "120363220634467964@g.us"
+      ],
+      "status": "allow",
+      "role": "client"
+    },
+    {
+      "id": "51970825518@s.whatsapp.net",
+      "name": null,
+      "private_chat": null,
+      "group_chats": [],
+      "status": "allow",
+      "role": "client"
+    },
+    {
+      "id": "51918920742@s.whatsapp.net",
+      "name": null,
+      "private_chat": null,
+      "group_chats": [],
+      "status": "allow",
+      "role": "client"
+    },
+    {
+      "id": "51970124323@s.whatsapp.net",
+      "name": null,
       "private_chat": null,
       "group_chats": [],
       "status": "allow",

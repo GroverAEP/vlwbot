@@ -4,13 +4,13 @@ import makeWASocket, {
     DisconnectReason,
     fetchLatestBaileysVersion
 } from '@whiskeysockets/baileys'
-
+import { execSync } from 'node:child_process';
 import qrcode from 'qrcode-terminal'
 import fs from 'fs-extra'
 // import ffmpegInstaller from '@ffmpeg-installer/ffmpeg'
 // import ffmpeg from 'fluent-ffmpeg'
 import pino from "pino"
-import { execSync } from 'child_process';
+// import { execSync } from 'child_process';
 
 
 import path from "path";
@@ -21,7 +21,6 @@ import { DB_LOCAL } from './src/core/models/db.js';
 import { all } from 'axios'
 import { dispatchHandlers } from './src/core/dispatcher/handlerDispatch.js'
 import { middleware } from './src/core/middleware/index.js'
-import { Owners } from './src/core/models/owners.js'
 import { Admins } from './src/core/models/admins.js'
 import { Users } from './src/core/models/user.js'
 import { Console, group } from 'console';
@@ -31,6 +30,7 @@ import { Group } from './src/core/models/group.js';
 import { fileURLToPath } from 'url';
 import { conexion_postgres } from './src/infrastructure/services/postgres/conexion_postgres_db.js';
 import { ConexionPostgres } from './src/core/models/db/conexion_postgres.js';
+import { Owner } from './src/core/models/owner.js';
 
 // ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 const processedMessages = new Set();
@@ -84,7 +84,7 @@ async function startBot() {
       manager:{
         users: new Users(config.routes.PATH_DATABASE),
         admins: new Admins(config.routes.PATH_DATABASE),
-        owners: new Owners(config.routes.PATH_DATABASE),
+        owner: new Owner(config.routes.PATH_DATABASE),
         groups: new Group(config.routes.PATH_DATABASE)
       }
  
@@ -191,7 +191,7 @@ function setupConnectionEvents(client, saveCreds) {
 
         console.log('Información del bot:', botUser)
 
-        const owners = await client.manager.owners.load()
+        const owners = await client.manager.owner.load()
         const alreadyOwner = owners.some(o => o.id === botOwnerId || o.idbot === botOwnerId)
 
         if (!alreadyOwner) {
@@ -241,7 +241,7 @@ function setupConnectionEvents(client, saveCreds) {
           console.log('♻️ Reiniciando bot en 5 segundos...')
           setTimeout(() => {
             // Opción 1: reinicio vía npm (si usas pm2 o similar, mejor usar process manager)
-            require('child_process').execSync('npm run start', { stdio: 'inherit' })
+            execSync('npm run start', { stdio: 'inherit' });
             process.exit(0)
           }, 5000)
         } catch (err) {
@@ -537,7 +537,7 @@ async function setupMessageEvents(client) {
       const userSenderPn = msg.key.senderPn;
       const participant = msg.key.participant;
       const allid = msg.key.remoteJid || msg.key.participant || msg.key.senderPn;
-
+      
       // Log central del mensaje
       console.log(`------MESSAGE ARGUMENTS ----\n`,
         `Mensaje: ${msg}\n`,
@@ -555,132 +555,18 @@ async function setupMessageEvents(client) {
       // Un usuario - grupo - central
       // Filtramos chats no deseados (opcional: ignorar broadcasts, status, etc.)
       if (chatId.endsWith('@broadcast') ||     // Listas de difusión
-          chatId.endsWith('@lid') ||           // Llamadas o algo raro
+          chatId.endsWith('@lid') ||
+          chatId.endsWith('@newsletter') ||          // Llamadas o algo raro
           chatId === 'status@broadcast') {     // Estados
           return;
       }
 
-      // Determinamos el tipo de chat
-      let chatType;
-
-      if (chatId.endsWith('@g.us')) {
-          chatType = 'group';          // Grupo
-      } else if (chatId.endsWith('@s.whatsapp.net')) {
-          chatType = 'private';        // Chat privado (DM)
-      } else {
-          chatType = 'unknown';        // Caso raro (no debería pasar)
-      }
       const text = getMessageText(msg);
-      
       await client.sock.ev.flush()
       await new Promise(r => setTimeout(r, 10))
-      // Ejecucion de comandos
-
-      // if (msg.key.fromMe &&) {
-        
-      // }
-
-
-      const {lid, user} = client.sock.user;
-
-      console.log(lid,user);
-
-
-
-
-      switch (chatType) {
-        case 'private':
-          // Mensaje de un estado.
-          // (chatId.endsWith('@broadcast'))
-          console.log("chat privado");
-          console.log(text)
-          console.log(msg.key.fromMe);
-          //Verificar es un usuario;
-          const isUser =  await client.middleware.isUser({userId})
-          // verificar si el usuario existe.
-          let userExist = client.manager.users.exists(userId);
-          // verificar si el primera vez que el usuario escribe al bot
-          const privateChatExist = client.manager.users.equals(userId,"private_chat",null);
-          //Carga el usuario
-          
-
-          
-          let user = await client.manager.users.get(userId);
-          
-          // Si private_chat es null, significa que es la primera vez que usa el bot desde el chat privado
-          // si el mensaje no viene de mi mismo
-          if (!msg.key.fromMe && privateChatExist|| !user) {
-            
-            console.log("Usuario con el campo vacio");
-            // await client.send.text(msg,"hola bienvenido al bot de Ice Freeze");
-            await client.manager.users.add_by_private({id:userId,name: msg.pushName});
-            user = await client.manager.users.get(userId);
-          }
-
-        
-          console.log(user)
-         
-          const   isClient = client.middleware.isClient(user.role);
-
-          //Si el usuario tiene el rol de client
-          //Si el mensaje no viene de mi mismo 
-          if (!msg.key.fromMe && isClient) {
-            console.log("El usuario es un:\n  --- Es un cliente");
-            //Ejecuta la funcionalidad de las 
-            //Ejecuta la funcionalidad de reservas
-            // dispatch -> modulo reservas
-            // Aun que este modulo sera diferente al de comandos
-            //
-            break;
-          }
-
-          
-              
-          // console.log("Hola buenos dias, estas usando")
-          await dispatchHandlers({msg,cleanText: text,client});
-          break;
-        case 'group':
-          console.log("es un chat grupo")
-          console.log(`mensaje en viado: ${text}`)
-          // client.manager.users.add_group_chats({id:userId,idGroup:idGroup});
-                // ---------- Identificar Es un grupo o un usuario midleware -------------------------
-                let group = await client.manager.groups.get(chatId);
-                const metadata = await client.sock.groupMetadata(chatId);
-                const participantJid = metadata.participants.find(p => p.id === userId)?.jid;              
-          //Si el grupo no existe se crea 
-          if (!group) {
-              //se agrega el grupo
-              console.log(metadata);
-
-              const group_data = {
-                id: metadata.id,
-                name: metadata.subject,
-                admins: metadata.participants
-                .filter(p => p.admin !== null)
-                .map(p => p.id),  // Todos los admins (p.admin puede ser 'admin' o 'superadmin')
-                participants: metadata.participants,
-                owner: metadata.owner || 
-                metadata.participants.find(p => p.admin === "superadmin")?.id || 
-                null,
-              } 
-
-
-              await client.manager.groups.add({data: group_data});
-            }
-            //verifica si existe el participante y agrega al grupo a su
-            if (participantJid) {
-              console.log("==============================");
-              console.log(participantJid)
-
-              await client.manager.users.add_group_chats({userId:participantJid,groupJid: chatId});
-            }
-          
-          await dispatchHandlers({msg,cleanText: text,client});
-          break;
-        
-        default:
-          break;
-      }
+        // console.log("Hola buenos dias, estas usando")
+      await dispatchHandlers({msg,cleanText: text,client});
+  
 
         
       }             
