@@ -561,6 +561,8 @@ async function setupMessageEvents(client) {
           return;
       }
 
+      console.log(msg);
+
       const text = getMessageText(msg);
       await client.sock.ev.flush()
       await new Promise(r => setTimeout(r, 10))

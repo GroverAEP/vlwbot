@@ -70,34 +70,34 @@ async function ytGetVideo({msg,client,cmd}) {
               }
               
             } catch (error) {
-    console.log("Error capturado:", error);
+            console.log("Error capturado:", error);
 
     // Verificación segura
-    const errorMessage = error?.message || String(error || "");
-    console.log(errorMessage);
-    if (errorMessage.includes("BAD_FILE_SIZE") || errorMessage.includes("File size too large")) {
-        console.warn("Video demasiado grande para envío como video → reenviando como documento");
+    //const errorMessage = error?.message || String(error || "");
+    //console.log(errorMessage);
+    //if (errorMessage.includes("BAD_FILE_SIZE") || errorMessage.includes("File size too large")) {
+    //    console.warn("Video demasiado grande para envío como video → reenviando como documento");
 
-        try {
-            await client.send.document(msg, { url: videoPath }, {
-                caption: caption + "\n\n📄 Enviado como documento (tamaño grande)",
-                mimetype: 'video/mp4'
-            });
+   //     try {
+    //        await client.send.document(msg, { url: finalPath }, {
+    //            caption: caption + "\n\n📄 Enviado como documento (tamaño grande)",
+    //            mimetype: 'video/mp4'
+   //         });
 
-            console.log("Video enviado exitosamente como documento");
-            setTimeout(() => deleteFile(videoPath), 5000);
+    //        console.log("Video enviado exitosamente como documento");
+    //        setTimeout(() => deleteFile(videoPath), 5000);
 
-        } catch (docError) {
-            console.error("También falló como documento:", docError);
-            await client.send.reply(msg, "❌ El video es demasiado grande para enviarse en WhatsApp (>2 GB aprox.).");
-            await deleteFile(videoPath);
-        }
+    //    } catch (docError) {
+    //        console.error("También falló como documento:", docError);
+    //        await client.send.reply(msg, "❌ El video es demasiado grande para enviarse en WhatsApp (>2 GB aprox.).");
+    //        await deleteFile(videoPath);
+    //    }
 
-    } else {
-        console.error("Error al enviar video:", error);
-        await client.send.reply(msg, "❌ Error al enviar el video. Inténtalo más tarde.");
-        await deleteFile(videoPath);
-    }
+   // } else {
+    //    console.error("Error al enviar video:", error);
+    //    await client.send.reply(msg, "❌ Error al enviar el video. Inténtalo más tarde.");
+    //    await deleteFile(videoPath);
+    //}
 }
         
 } 

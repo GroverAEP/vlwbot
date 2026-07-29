@@ -34,6 +34,7 @@ export default class ReserveHandler {
     async run({text}) {
         console.log(this.client.msg);
         console.log("Ejecutando las opciones de los botones")
+        
         return await handlerSaludo.run({client,text}).then(
             await handlerActions.run({client,text})
         );
