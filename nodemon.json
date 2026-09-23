@@ -1,0 +1,8 @@
+{
+  "ignore": [
+    "src/infrastructure/auth/*",
+    "node_modules/*"
+  ],
+  "watch": ["index.js", "src/**/*.js"],
+  "ext": "js,json"
+}

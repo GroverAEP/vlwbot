@@ -2,11 +2,20 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs-extra";
 
+const COOKIES_PATH = path.join(process.cwd(), "cookies.txt");
+
 export async function downloadYoutubeVideo(query) {
     return new Promise(async (resolve, reject) => {
         try {
+
+            console.log("reproducioendo")
+
+            if (!query || typeof query !== "string" || !query.trim()) {
+                return reject("Debes indicar un enlace o un término de búsqueda");
+            }
+
             const isUrl = query.startsWith("http://") || query.startsWith("https://");
-            const cleanQuery = query.replace(/"/g, '');
+            const cleanQuery = query.replace(/"/g, '').trim();
 
             const outputDir = path.join(process.cwd(), "src/media/video");
             await fs.ensureDir(outputDir);
@@ -15,17 +24,29 @@ export async function downloadYoutubeVideo(query) {
             const outputTemplate = path.join(outputDir, `${fileBase}.%(ext)s`);
 
             const isYoutube = cleanQuery.includes("youtube.com") || cleanQuery.includes("youtu.be");
-            const isYoutubeSearch = isYoutube && !isUrl;
+            const isYoutubeSearch = !isUrl; // cualquier texto que no sea URL directa se trata como búsqueda
 
             const finalQuery = isYoutubeSearch
                 ? `ytsearch1:${cleanQuery}`
                 : cleanQuery;
 
             // =========================
+            // 🍪 COOKIES OPCIONALES
+            // =========================
+            // Solo se agregan los flags --cookies si el archivo existe.
+            // Así yt-dlp funciona igual sin necesidad de tener cookies.txt.
+            const cookiesExist = await fs.pathExists(COOKIES_PATH);
+            const cookiesArgs = cookiesExist ? ['--cookies', COOKIES_PATH] : [];
+
+            if (!cookiesExist) {
+                console.log("cookies.txt no encontrado, continuando sin cookies (puede fallar en videos restringidos).");
+            }
+
+            // =========================
             // 🔎 PASO 1: METADATA
             // =========================
             const infoProcess = spawn('yt-dlp', [
-                '--cookies', 'cookies.txt',
+                ...cookiesArgs,
                 '-J',
                 finalQuery
             ]);
@@ -36,8 +57,19 @@ export async function downloadYoutubeVideo(query) {
             infoProcess.stdout.on('data', d => infoData += d.toString());
             infoProcess.stderr.on('data', d => infoError += d.toString());
 
-            infoProcess.on('close', async (code) => {
+            console.log(infoProcess)
 
+            // Si yt-dlp no está instalado o no se puede ejecutar, 'close' nunca
+            // se dispara con un código útil — hay que capturar 'error' aparte.
+            infoProcess.on('error', (err) => {
+                console.error("No se pudo ejecutar yt-dlp (metadata):", err);
+                reject("yt-dlp no está disponible en el sistema");
+            });
+
+
+              infoProcess.on('close', async (code) => {
+              try {
+                console.log("[yt-dlp] Metadata finalizada con código:", code);
                 let videoInfoExtra = {};
 
                 if (code !== 0 || !infoData) {
@@ -57,7 +89,6 @@ export async function downloadYoutubeVideo(query) {
                     return reject("Metadata vacía");
                 }
 
-                // ===== TU MISMA ESTRUCTURA =====
                 videoInfoExtra = {
                     title: json.title || json.fulltitle || "Sin título",
                     platform: json.extractor || "Desconocida",
@@ -78,8 +109,10 @@ export async function downloadYoutubeVideo(query) {
                 // =========================
                 // 📥 PASO 2: DESCARGA
                 // =========================
+                console.log("[yt-dlp] Iniciando descarga...");
+
                 const dlProcess = spawn('yt-dlp', [
-                    '--cookies', 'cookies.txt',
+                    ...cookiesArgs,
                     '-f', 'bv*+ba/b',
                     '--merge-output-format', 'mp4',
                     '-o', outputTemplate,
@@ -92,14 +125,27 @@ export async function downloadYoutubeVideo(query) {
                 dlProcess.stdout.on('data', d => dlStdout += d.toString());
                 dlProcess.stderr.on('data', d => dlStderr += d.toString());
 
-                dlProcess.on('close', async (dlCode) => {
+                dlProcess.on('error', (err) => {
+                    console.error("No se pudo ejecutar yt-dlp (descarga):", err);
+                    reject("yt-dlp no está disponible en el sistema");
+                });
 
+                dlProcess.on('close', async (dlCode) => {
+                  try {
+                    console.log("[yt-dlp] Descarga finalizada con código:", dlCode);
                     if (dlCode !== 0) {
                         console.error("yt-dlp ERROR:", dlStderr);
                         return reject(dlStderr || "Error en descarga");
                     }
 
-                    const files = await fs.readdir(outputDir);
+                    let files;
+                    try {
+                        files = await fs.readdir(outputDir);
+                    } catch (e) {
+                        console.error("No se pudo leer la carpeta de salida:", e);
+                        return reject("Error al acceder a la carpeta de descargas");
+                    }
+
                     const finalFile = files.find(f => f.startsWith(fileBase));
 
                     if (!finalFile) {
@@ -128,10 +174,19 @@ export async function downloadYoutubeVideo(query) {
                     };
 
                     resolve(video_info);
+                  } catch (e) {
+                    console.error("Error inesperado procesando la descarga:", e);
+                    reject(e);
+                  }
                 });
+              } catch (e) {
+                console.error("Error inesperado procesando la metadata:", e);
+                reject(e);
+              }
             });
 
         } catch (err) {
+            console.log("error en el downloadyoutube")
             reject(err);
         }
     });

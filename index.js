@@ -18,7 +18,6 @@ import path from "path";
 import { Sender } from "./src/core/models/sender.js";
 import { config } from "./src/core/config/index.js";
 import { DB_LOCAL } from './src/core/models/db.js';
-import { all } from 'axios'
 import { dispatchHandlers } from './src/core/dispatcher/handlerDispatch.js'
 import { middleware } from './src/core/middleware/index.js'
 import { Admins } from './src/core/models/admins.js'
@@ -164,8 +163,6 @@ export function setupMultiMedia(sock) {
 
 
 
-
-
 function setupConnectionEvents(client, saveCreds) {
   client.sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update
@@ -192,12 +189,13 @@ function setupConnectionEvents(client, saveCreds) {
         console.log('Información del bot:', botUser)
 
         const owners = await client.manager.owner.load()
-        const alreadyOwner = owners.some(o => o.id === botOwnerId || o.idbot === botOwnerId)
+        const ownersList = Array.isArray(owners) ? owners : []
+        const alreadyOwner = ownersList.some(o => o.id === botOwnerId || o.idbot === botOwnerId)
 
         if (!alreadyOwner) {
-          await client.manager.owners.add({
+          await client.manager.owner.add({          // ← "owner" singular, coincide con el manager
             idbot: botOwnerId,
-            id: botUser.lid || botOwnerId,   // fallback razonable
+            id: botUser.lid || botOwnerId,           // fallback razonable
             name: botUser.name || 'OwnerBot',
             status: 'free',
             role: 'owner'
@@ -240,9 +238,8 @@ function setupConnectionEvents(client, saveCreds) {
 
           console.log('♻️ Reiniciando bot en 5 segundos...')
           setTimeout(() => {
-            // Opción 1: reinicio vía npm (si usas pm2 o similar, mejor usar process manager)
-            execSync('npm run start', { stdio: 'inherit' });
-            process.exit(0)
+            // Dejamos que nodemon/pm2 reinicie el proceso — evita procesos duplicados
+            process.exit(1)
           }, 5000)
         } catch (err) {
           console.error('❌ No se pudo eliminar carpeta o reiniciar:', err)
@@ -258,7 +255,6 @@ function setupConnectionEvents(client, saveCreds) {
   })
   client.sock.ev.on('creds.update', saveCreds)
 }
-
 
 // function setupConnectionEvents(client,saveCreds) {
 //   // ==================== CONEXIÓN ====================
@@ -522,6 +518,14 @@ async function setupMessageEvents(client) {
       //Capta los mensajes iniciales 
       const msg = messages[0];
       // Filtro anti-undefined / anti-session-corrupta
+      //de donde viene el mnesaje
+      const chatId = msg.key.remoteJid;
+      
+      console.log(`---ChatPosterior----\n`,
+        `Mensaje: ${msg.message}\n`,
+        `chatId: ${chatId}\n`,)
+      
+      
       if (!msg || !msg.message) {
           console.log("⚠️ Mensaje ignorado (undefined o no desencriptado)");
           return;
@@ -531,7 +535,7 @@ async function setupMessageEvents(client) {
       const prefix = client.config.defaults.prefix;
       
       //de donde viene el mnesaje
-      const chatId = msg.key.remoteJid;
+      //const chatId = msg.key.remoteJid;
       // Quien envio el mensaje
       const userId = msg.key.participant || msg.key.senderPn || msg.key.remoteJid;
       const userSenderPn = msg.key.senderPn;

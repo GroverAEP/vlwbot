@@ -14967,6 +14967,44 @@
       "isCommunity": false,
       "linkedGroupJid": null,
       "isAnnounce": false
+    },
+    {
+      "id": "120363429225515043@g.us",
+      "name": "S",
+      "status": "allowed",
+      "settings": {
+        "welcomeEnabled": false,
+        "welcomeMessage": "¡Bienvenido @{user} al grupo {subject}! 👋",
+        "goodbyeEnabled": false,
+        "goodbyeMessage": "¡@{user} ha abandonado el grupo! 👋",
+        "showDelete": false,
+        "antiLink": false,
+        "antiSpam": false,
+        "maxWarnings": 3,
+        "autoMute": false,
+        "onlyAdmins": false,
+        "modeNsfw": false
+      },
+      "admins": [
+        "95172213870719@lid"
+      ],
+      "partipants": [
+        {
+          "id": "95172213870719@lid",
+          "jid": "51955358077@s.whatsapp.net",
+          "lid": "95172213870719@lid",
+          "admin": "superadmin"
+        }
+      ],
+      "owner": "95172213870719@lid",
+      "creation": 1777140588,
+      "participantsCount": 3,
+      "lastActivity": 1777140588,
+      "warnings": {},
+      "bannedUsers": [],
+      "isCommunity": false,
+      "linkedGroupJid": null,
+      "isAnnounce": false
     }
   ]
 }

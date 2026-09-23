@@ -4,7 +4,7 @@ import { SuccessMp4GetVideo } from "../messages/SuccessMessage.js";
 
 
 export const handlerYtGetVIdeo= {
-    name: "mp3",
+    name: "mp4",
     role: "all",
     run: ytGetVideo,
 };
@@ -15,9 +15,11 @@ async function ytGetVideo({msg,client,cmd}) {
             // const query = text.slice(`${prefix}yt `.length).trim();
             
             if (!cmd) {
-                await client.send.reply(msg, "❌ Debes escribir un enlace o nombre de canción. \n site:youtube - Utiliza: !yt {url} ");
+                await client.send.reply(msg, "❌ Debes escribir un enlace o nombre de canción. \n site:youtube - Utiliza: !mp4 {url} ");
               return; // ← Esto detiene TODO lo que viene después
             }   
+
+
 
             // if (parts.length === 1) {
             //     await client.send.reply(msg, "Comando no disponible");
@@ -29,7 +31,8 @@ async function ytGetVideo({msg,client,cmd}) {
               
               const {metadata,finalPath,peso} = await downloadYoutubeVideo(cmd);
               
-              
+                console.log("✅ Resultado de downloadYoutubeVideo:", { metadata, finalPath, peso });
+                              
               const fileSizeMB = parseFloat(peso) || metadata.estimated_size_mb || 100; // fallback
               // console.log(a.finalPath);
               const successMessage = new SuccessMp4GetVideo(metadata.platform);
